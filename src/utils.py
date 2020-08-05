@@ -1,6 +1,5 @@
 from scipy.io import loadmat
 import scipy. sparse as sparse
-from sklearn.preprocessing import MultiLabelBinarizer
 import numpy as np
 from sklearn.multiclass import OneVsRestClassifier
 
@@ -14,9 +13,7 @@ def from_mat_file(path):
     network = sparse.csr_matrix(mat['network'])  # Network
     labels = mat['group']  # Labels
     labels_matrix = sparse.csr_matrix(labels)
-    labels_count = labels_matrix.shape[1]
-    mlb = MultiLabelBinarizer(range(labels_count))
-    return network, labels_matrix, mlb
+    return network, labels_matrix
 
 
 class TopKRanker(OneVsRestClassifier):

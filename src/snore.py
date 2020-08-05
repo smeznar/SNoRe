@@ -94,8 +94,15 @@ class SNoRe:
 
         logging.info("Generating similarity matrix")
         if self.fixed_dimension:
-            return self.generate_similarity_fixed(hashes, ranked_features[:min(self.dimension, network.shape[0])])
-        return self.generate_similarity_matrix(hashes, ranked_features).tocsr()
+            embedding = self.generate_similarity_fixed(hashes, ranked_features[:min(self.dimension, network.shape[0])])
+        else:
+            embedding = self.generate_similarity_matrix(hashes, ranked_features).tocsr()
+
+        # Check if embedding size is less then tau
+        assert (not sparse.issparse(embedding)) or len(embedding.data) <= (self.dimension * network.shape[0])
+
+        logging.info("Embedding done")
+        return embedding
 
     def generate_walk_hashes(self, network):
         """ Generate random walks and hash them.
@@ -155,7 +162,7 @@ class SNoRe:
         for i in ranked_features:
             # "Round" similarity values so they need less space allowing more features to be chosen
             feature = (np.digitize(cosine_similarity(hashes, hashes[i, :], dense_output=False).toarray(),
-                                   bins=bins)-1)/self.num_bins
+                                   bins=bins)-1)/(self.num_bins - 1)
             feature = sparse.coo_matrix(feature, dtype=np.half)
             # Reduce tau by number of nonzero similarities
             tau -= len(feature.data)
@@ -164,6 +171,7 @@ class SNoRe:
                 self.selected_features.append(i)
             else:
                 break
+
         return sparse.hstack(columns)
 
     def generate_similarity_fixed(self, hashes, features):
@@ -176,10 +184,14 @@ class SNoRe:
         Returns:
             matrix: similarity matrix.
         """
+        self.selected_features = features
+
         # Jaccard, Canberra and Standardized Euclidean don't take sparse matrices as input.
         # Only Cosine Similarity returns a sparse representation
         if self.metric == "jaccard":
-            return pairwise_distances(hashes.toarray(), hashes[features, :].toarray(), metric="jaccard")
+            return sparse.csr_matrix(1 - pairwise_distances(hashes.toarray(),
+                                                            hashes[features, :].toarray(),
+                                                            metric="jaccard"))
         elif self.metric == "euclidean":
             return pairwise_distances(hashes, hashes[features, :], metric="euclidean")
         elif self.metric == "seuclidean":
@@ -191,7 +203,7 @@ class SNoRe:
 
 
 if __name__ == '__main__':
-    network = loadmat("Path to dataset")["network"]
+    network = loadmat("path to dataset")["network"]
     embedder = SNoRe()
     emb = embedder.embed(network)
     print(emb.shape)

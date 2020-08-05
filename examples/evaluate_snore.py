@@ -91,5 +91,5 @@ if __name__ == '__main__':
     # parser.add_argument("--save")
     args = parser.parse_args()
 
-    network, labels, mlb = from_mat_file(args.dataset)
+    network, labels = from_mat_file(args.dataset)
     evaluate_snore(network, labels, args.num_shuffles, args.all, args.data_perc)
