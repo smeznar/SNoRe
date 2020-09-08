@@ -13,7 +13,12 @@ logging.getLogger().setLevel(logging.INFO)
 
 
 @jit(parallel=True, nogil=True, nopython=True)
-def numba_walk_kernel(walk_matrix, node_name, sparse_pointers, sparse_neighbors, num_steps=3, num_walks=100):
+def numba_walk_kernel(walk_matrix,
+                      node_name,
+                      sparse_pointers,
+                      sparse_neighbors,
+                      num_steps=3,
+                      num_walks=100):
     """ Create num_walks random walks of length num_steps starting at node node_name.
     Walks are saved to the walk_matrix.
 
@@ -31,10 +36,11 @@ def numba_walk_kernel(walk_matrix, node_name, sparse_pointers, sparse_neighbors,
         offset = walk * length
         walk_matrix[offset] = node_name
         for step in prange(num_steps):
-            num_neighs = sparse_pointers[curr+1] - sparse_pointers[curr]
+            num_neighs = sparse_pointers[curr + 1] - sparse_pointers[curr]
             if num_neighs > 0:
-                curr = sparse_neighbors[sparse_pointers[curr] + np.random.randint(num_neighs)]
-            idx = offset+step+1
+                curr = sparse_neighbors[sparse_pointers[curr] +
+                                        np.random.randint(num_neighs)]
+            idx = offset + step + 1
             walk_matrix[idx] = curr
 
 
@@ -53,8 +59,14 @@ class SNoRe:
                       similarity between two hashed walks
         num_bins (int): If fixed_dimension is False, how similarity score is ... .
     """
-    def __init__(self, dimension=256, num_walks=1024, max_walk_length=5, inclusion=0.005, fixed_dimension=False,
-                 metric="cosine", num_bins=256):
+    def __init__(self,
+                 dimension=256,
+                 num_walks=1024,
+                 max_walk_length=5,
+                 inclusion=0.005,
+                 fixed_dimension=False,
+                 metric="cosine",
+                 num_bins=256):
         self.dimension = dimension
         self.num_walks = num_walks
         self.max_walk_length = max_walk_length
@@ -73,7 +85,8 @@ class SNoRe:
             ndarray: Numpy array of walks per walk length.
         """
         samples = np.random.uniform(0, 1, self.num_walks)
-        return np.histogram(samples, self.max_walk_length)[0]  # We use histogram function to sort samples into
+        return np.histogram(samples, self.max_walk_length)[
+            0]  # We use histogram function to sort samples into
         # bins that represent walk lengths
 
     def embed(self, network):
@@ -89,17 +102,23 @@ class SNoRe:
         hashes = self.generate_walk_hashes(network)
 
         # Rank nodes
-        pagerank_scores = nx.pagerank_scipy(nx.from_scipy_sparse_matrix(network))
-        ranked_features = np.argsort([pagerank_scores[i] for i in range(len(pagerank_scores))])[::-1]
+        pagerank_scores = nx.pagerank_scipy(
+            nx.from_scipy_sparse_matrix(network))
+        ranked_features = np.argsort(
+            [pagerank_scores[i] for i in range(len(pagerank_scores))])[::-1]
 
         logging.info("Generating similarity matrix")
         if self.fixed_dimension:
-            embedding = self.generate_similarity_fixed(hashes, ranked_features[:min(self.dimension, network.shape[0])])
+            embedding = self.generate_similarity_fixed(
+                hashes,
+                ranked_features[:min(self.dimension, network.shape[0])])
         else:
-            embedding = self.generate_similarity_matrix(hashes, ranked_features).tocsr()
+            embedding = self.generate_similarity_matrix(
+                hashes, ranked_features).tocsr()
 
         # Check if embedding size is less then tau
-        assert (not sparse.issparse(embedding)) or len(embedding.data) <= (self.dimension * network.shape[0])
+        assert (not sparse.issparse(embedding)) or len(
+            embedding.data) <= (self.dimension * network.shape[0])
 
         logging.info("Embedding done")
         return embedding
@@ -125,13 +144,19 @@ class SNoRe:
             # Generate walks
             for j, num in enumerate(self.distribution):
                 walk_matrix = -np.ones((num, (j + 2)), dtype=dtype, order='C')
-                walk_matrix = np.reshape(walk_matrix, (walk_matrix.size,), order='C')
-                numba_walk_kernel(walk_matrix, i, sparse_pointers, sparse_neighbors, num_steps=j+1, num_walks=num)
+                walk_matrix = np.reshape(walk_matrix, (walk_matrix.size, ),
+                                         order='C')
+                numba_walk_kernel(walk_matrix,
+                                  i,
+                                  sparse_pointers,
+                                  sparse_neighbors,
+                                  num_steps=j + 1,
+                                  num_walks=num)
                 generated_walks += walk_matrix.tolist()
             # Count occurrences of nodes in random walks
             score_hash = Counter(generated_walks)
             # We only include node that are visited with frequency at least self.inclusion
-            thresh = len(generated_walks)*self.inclusion
+            thresh = len(generated_walks) * self.inclusion
             rows = []
             cols = []
             vals = []
@@ -141,7 +166,9 @@ class SNoRe:
                     rows.append(0)
                     cols.append(node)
                     vals.append(occurances)
-            hashes.append(sparse.coo_matrix((vals, (rows, cols)), shape=(1, network.shape[1])))
+            hashes.append(
+                sparse.coo_matrix((vals, (rows, cols)),
+                                  shape=(1, network.shape[1])))
         # Stack hashes to make the hash matrix and normalize them
         return normalize(sparse.vstack(hashes), "l1")
 
@@ -161,8 +188,9 @@ class SNoRe:
         bins = np.linspace(start=0, stop=1, num=self.num_bins)
         for i in ranked_features:
             # "Round" similarity values so they need less space allowing more features to be chosen
-            feature = (np.digitize(cosine_similarity(hashes, hashes[i, :], dense_output=False).toarray(),
-                                   bins=bins)-1)/(self.num_bins - 1)
+            feature = (np.digitize(cosine_similarity(
+                hashes, hashes[i, :], dense_output=False).toarray(),
+                                   bins=bins) - 1) / (self.num_bins - 1)
             feature = sparse.coo_matrix(feature, dtype=np.half)
             # Reduce tau by number of nonzero similarities
             tau -= len(feature.data)
@@ -189,21 +217,30 @@ class SNoRe:
         # Jaccard, Canberra and Standardized Euclidean don't take sparse matrices as input.
         # Only Cosine Similarity returns a sparse representation
         if self.metric == "jaccard":
-            return sparse.csr_matrix(1 - pairwise_distances(hashes.toarray(),
-                                                            hashes[features, :].toarray(),
-                                                            metric="jaccard"))
+            return sparse.csr_matrix(
+                1 - pairwise_distances(hashes.toarray(),
+                                       hashes[features, :].toarray(),
+                                       metric="jaccard"))
         elif self.metric == "euclidean":
-            return pairwise_distances(hashes, hashes[features, :], metric="euclidean")
+            return pairwise_distances(hashes,
+                                      hashes[features, :],
+                                      metric="euclidean")
         elif self.metric == "seuclidean":
-            return pairwise_distances(hashes.toarray(), hashes[features, :].toarray(), metric="seuclidean")
+            return pairwise_distances(hashes.toarray(),
+                                      hashes[features, :].toarray(),
+                                      metric="seuclidean")
         elif self.metric == "canberra":
-            return pairwise_distances(hashes.toarray(), hashes[features, :].toarray(), metric="canberra")
+            return pairwise_distances(hashes.toarray(),
+                                      hashes[features, :].toarray(),
+                                      metric="canberra")
         else:
-            return cosine_similarity(hashes, hashes[features, :], dense_output=False)
+            return cosine_similarity(hashes,
+                                     hashes[features, :],
+                                     dense_output=False)
 
 
 if __name__ == '__main__':
-    network = loadmat("path to dataset")["network"]
+    network_adj = loadmat("../data/cora.mat")["network"]
     embedder = SNoRe()
-    emb = embedder.embed(network)
+    emb = embedder.embed(network_adj)
     print(emb.shape)

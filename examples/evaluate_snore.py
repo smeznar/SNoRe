@@ -60,7 +60,8 @@ def evaluate_snore(network, labels, num_shuffles=10, all=False, data_perc=0.5):
                 averages = ["micro", "macro"]
                 for average in averages:
                     results[average] = f1_score(mlb.fit_transform(y_test),
-                                                    mlb.fit_transform(preds), average=average)
+                                                mlb.fit_transform(preds),
+                                                average=average)
 
                     all_results[train_percent].append(results)
     print('Results of SNoRe using embeddings of dimensionality', emb.shape[1])
@@ -78,18 +79,30 @@ def evaluate_snore(network, labels, num_shuffles=10, all=False, data_perc=0.5):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Graph Embedding Evaluation Utility')
-    parser.add_argument('--dataset', help='Path to the dataset',
-                        required=True, action='store')
-    parser.add_argument("--num_shuffles", default=10, type=int, help='Number of shuffles.')
-    parser.add_argument("--all", default=False, action='store_true',
+    parser = argparse.ArgumentParser(
+        description='Graph Embedding Evaluation Utility')
+    parser.add_argument('--dataset',
+                        help='Path to the dataset',
+                        required=True,
+                        action='store')
+    parser.add_argument("--num_shuffles",
+                        default=10,
+                        type=int,
+                        help='Number of shuffles.')
+    parser.add_argument("--all",
+                        default=False,
+                        action='store_true',
                         help='The embeddings are evaluated on all training percents from 10 to 90'
-                             ' when this flag is set to true.')
-    parser.add_argument("--data_perc", default=0.5, type=float, help='Data percentage if all is not chosen.')
+                        ' when this flag is set to true.')
+    parser.add_argument("--data_perc",
+                        default=0.5,
+                        type=float,
+                        help='Data percentage if all is not chosen.')
     # parser.add_argument("--out_file", default="embedding.npz", help='Filename where embedding is saved if flag'
     #                                                                 '--save is added')
     # parser.add_argument("--save")
     args = parser.parse_args()
 
     network, labels = from_mat_file(args.dataset)
-    evaluate_snore(network, labels, args.num_shuffles, args.all, args.data_perc)
+    evaluate_snore(network, labels, args.num_shuffles, args.all,
+                   args.data_perc)

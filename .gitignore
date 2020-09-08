@@ -218,3 +218,10 @@ dmypy.json
 .pytype/
 
 # End of https://www.toptal.com/developers/gitignore/api/pycharm+iml,python
+/.idea/.gitignore
+/examples/catboost_info/catboost_training.json
+/examples/catboost_info/learn/events.out.tfevents
+/examples/catboost_info/learn_error.tsv
+/.idea/inspectionProfiles/profiles_settings.xml
+/examples/catboost_info/time_left.tsv
+/.idea/vcs.xml

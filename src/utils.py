@@ -1,5 +1,5 @@
 from scipy.io import loadmat
-import scipy. sparse as sparse
+import scipy.sparse as sparse
 import numpy as np
 from sklearn.multiclass import OneVsRestClassifier
 
