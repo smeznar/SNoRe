@@ -1,24 +1,3 @@
-# SNoRe
-SNoRe: Scalable Unsupervised Learning of Symbolic Node Representations
-
-![algorithm overview](/images/algorithm_overview.png)
-
-# Installing SNoRe
-```
-python setup.py install
-```
-
-or
-
-```
-pip install snore-embedding
-```
-
-# Using SNoRe
-A simple use-case is shown below.
-First, we import the necessary libraries and load the dataset and its labels.
-
-```
 from snore import SNoRe
 from scipy.io import loadmat
 from sklearn.utils import shuffle
@@ -31,12 +10,7 @@ import numpy as np
 dataset = loadmat("../data/cora.mat")
 network_adj = dataset["network"]
 labels = dataset["group"]
-```
 
-We then create the SNoRe model and embed the network. 
-In code, the default parameters are shown.
-
-```
 # Create the model
 model = SNoRe(dimension=256, num_walks=1024, max_walk_length=5,
               inclusion=0.005, fixed_dimension=False, metric="cosine",
@@ -44,11 +18,7 @@ model = SNoRe(dimension=256, num_walks=1024, max_walk_length=5,
 
 # Embed the network
 embedding = model.embed(network_adj)
-```
 
-Finally, we train the classifier and test on the remaining data.
-
-```
 # Train the classifier
 nodes = shuffle([i for i in range(network_adj.shape[0])])
 train_mask = nodes[:int(network_adj.shape[0]*0.8)]
@@ -63,7 +33,3 @@ print("Micro score:",
       f1_score(np.argmax(labels[test_mask], axis=1),
                np.argmax(predictions, axis=1),
                average='micro'))
-
-```
-
-Further examples can be found in the example folder.
