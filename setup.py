@@ -15,7 +15,7 @@ def parse_requirements(file):
 
 
 setup(name='snore-embedding',
-      version='0.1',
+      version='0.2.2',
       url='https://github.com/smeznar/SNoRe',
       author='Sebastian Mežnar and Blaž Škrlj',
       author_email='smeznar@gmail.com',
@@ -23,7 +23,7 @@ setup(name='snore-embedding',
       keywords=['graph', 'representation learning', 'symbolic', 'snore', 'unsupervised learning'],
       description='SNoRe: Scalable Unsupervised Learning of Symbolic Node Representations',
       long_description=long_description,
-      long_description_type='text/markdown',
+      long_description_content_type='text/markdown',
       py_modules=['snore'],
       classifiers=['Intended Audience :: Information Technology',
                    'Intended Audience :: Science/Research',

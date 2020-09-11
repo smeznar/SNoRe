@@ -1,7 +1,21 @@
-# SNoRe
-SNoRe: Scalable Unsupervised Learning of Symbolic Node Representations
+# SNoRe: Scalable Unsupervised Learning of Symbolic Node Representations
+This repository contains the implementation of SNoRe algorithm from SNoRe paper
+found here:
 
-![algorithm overview](/images/algorithm_overview.png)
+```
+@misc{meznar2020snore,
+    title={SNoRe: Scalable Unsupervised Learning of Symbolic Node Representations},
+    author={Sebastian Me\v{z}nar and Nada Lavra\v{c} and Bla\v{z} \v{S}krlj},
+    year={2020},
+    eprint={2009.04535},
+    archivePrefix={arXiv},
+    primaryClass={cs.LG}
+}
+```
+
+An overview of the algorithm is presented in the image below:
+
+![algorithm overview](https://github.com/smeznar/SNoRe/blob/master/images/algorithm_overview.png)
 
 # Installing SNoRe
 ```
@@ -66,4 +80,4 @@ print("Micro score:",
 
 ```
 
-Further examples can be found in the example folder.
+Further examples of evaluation and embedding explainability can be found in the example folder.
