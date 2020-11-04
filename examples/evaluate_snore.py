@@ -10,7 +10,7 @@ from src.snore import SNoRe
 from src.utils import from_mat_file, TopKRanker
 
 
-def evaluate_snore(network, labels, num_shuffles=10, all=False, data_perc=0.5):
+def evaluate_snore(network, labels, mlb, num_shuffles=10, all=False, data_perc=0.5):
     # Embedding
     model = SNoRe()
     emb = model.embed(network)
@@ -103,6 +103,6 @@ if __name__ == '__main__':
     # parser.add_argument("--save")
     args = parser.parse_args()
 
-    network, labels = from_mat_file(args.dataset)
-    evaluate_snore(network, labels, args.num_shuffles, args.all,
+    network, labels, mlb = from_mat_file(args.dataset)
+    evaluate_snore(network, labels, mlb, args.num_shuffles, args.all,
                    args.data_perc)

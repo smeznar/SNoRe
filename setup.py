@@ -15,7 +15,7 @@ def parse_requirements(file):
 
 
 setup(name='snore-embedding',
-      version='0.2.2',
+      version='0.3.1',
       url='https://github.com/smeznar/SNoRe',
       author='Sebastian Mežnar and Blaž Škrlj',
       author_email='smeznar@gmail.com',

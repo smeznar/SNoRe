@@ -188,8 +188,14 @@ class SNoRe:
         bins = np.linspace(start=0, stop=1, num=self.num_bins)
         for i in ranked_features:
             # "Round" similarity values so they need less space allowing more features to be chosen
-            feature = (np.digitize(cosine_similarity(
-                hashes, hashes[i, :], dense_output=False).toarray(),
+            if self.metric == "cosine":
+                similarity_column = cosine_similarity(hashes, hashes[i, :], dense_output=False)
+            elif self.metric == "HPI":
+                similarity_column = SNoRe.HPI(hashes, [i])
+            else:
+                # HDI
+                similarity_column = SNoRe.HDI(hashes, [i])
+            feature = (np.digitize(similarity_column.toarray(),
                                    bins=bins) - 1) / (self.num_bins - 1)
             feature = sparse.coo_matrix(feature, dtype=np.half)
             # Reduce tau by number of nonzero similarities
@@ -201,6 +207,36 @@ class SNoRe:
                 break
 
         return sparse.hstack(columns)
+
+    @staticmethod
+    def HPI(hashes, features):
+        nonzero_items = Counter(hashes.nonzero()[0])
+        y = []
+        x = []
+        val = []
+        for i, f in enumerate(features):
+            a = hashes.multiply(hashes[f, :])
+            b = Counter(a.nonzero()[0])
+            for k in b.keys():
+                x.append(i)
+                y.append(k)
+                val.append(b[k]/min(nonzero_items[f], nonzero_items[k]))
+        return sparse.csc_matrix((val, (y, x)), shape=(hashes.shape[0], len(features)))
+
+    @staticmethod
+    def HDI(hashes, features):
+        nonzero_items = Counter(hashes.nonzero()[0])
+        y = []
+        x = []
+        val = []
+        for i, f in enumerate(features):
+            a = hashes.multiply(hashes[f, :])
+            b = Counter(a.nonzero()[0])
+            for k in b.keys():
+                x.append(i)
+                y.append(k)
+                val.append(b[k]/max(nonzero_items[f], nonzero_items[k]))
+        return sparse.csc_matrix((val, (y, x)), shape=(hashes.shape[0], len(features)))
 
     def generate_similarity_fixed(self, hashes, features):
         """ Generates a similarity matrix of fixed dimension
@@ -233,6 +269,10 @@ class SNoRe:
             return pairwise_distances(hashes.toarray(),
                                       hashes[features, :].toarray(),
                                       metric="canberra")
+        elif self.metric == "HPI":
+            return SNoRe.HPI(hashes, features)
+        elif self.metric == "HDI":
+            return SNoRe.HDI(hashes, features)
         else:
             return cosine_similarity(hashes,
                                      hashes[features, :],
@@ -241,6 +281,6 @@ class SNoRe:
 
 if __name__ == '__main__':
     network_adj = loadmat("../data/cora.mat")["network"]
-    embedder = SNoRe()
+    embedder = SNoRe(metric="HPI")
     emb = embedder.embed(network_adj)
     print(emb.shape)
