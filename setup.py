@@ -1,5 +1,5 @@
 import os
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
 with open("README.md", "r") as fl:
@@ -15,7 +15,7 @@ def parse_requirements(file):
 
 
 setup(name='snore-embedding',
-      version='0.3.1',
+      version='0.3.2',
       url='https://github.com/smeznar/SNoRe',
       author='Sebastian Mežnar and Blaž Škrlj',
       author_email='smeznar@gmail.com',
@@ -25,6 +25,7 @@ setup(name='snore-embedding',
       long_description=long_description,
       long_description_content_type='text/markdown',
       py_modules=['snore'],
+      packages=find_packages(),
       classifiers=['Intended Audience :: Information Technology',
                    'Intended Audience :: Science/Research',
                    'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
@@ -32,5 +33,4 @@ setup(name='snore-embedding',
                    'Programming Language :: Python :: 3',
                    'Topic :: Scientific/Engineering :: Information Analysis',
                    'Topic :: Scientific/Engineering :: Artificial Intelligence'],
-      package_dir={'': 'src'},
       install_requires=parse_requirements('requirements.txt'))

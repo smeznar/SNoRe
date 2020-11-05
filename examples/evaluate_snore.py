@@ -6,8 +6,8 @@ import numpy as np
 from collections import defaultdict
 from six import iteritems
 
-from src.snore import SNoRe
-from src.utils import from_mat_file, TopKRanker
+from snore.snore import SNoRe
+from snore.utils import from_mat_file, TopKRanker
 
 
 def evaluate_snore(network, labels, mlb, num_shuffles=10, all=False, data_perc=0.5):

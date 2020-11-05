@@ -185,7 +185,7 @@ class SNoRe:
         # Create a sparse matrix with tau floating point values (16 bit). tau = d * |N|
         tau = self.dimension * hashes.shape[0]
         columns = []
-        bins = np.linspace(start=0, stop=1, num=self.num_bins)
+        bins = np.linspace(start=0, stop=1, num=(self.num_bins if self.num_bins is not None else 1))
         for i in ranked_features:
             # "Round" similarity values so they need less space allowing more features to be chosen
             if self.metric == "cosine":
@@ -195,9 +195,12 @@ class SNoRe:
             else:
                 # HDI
                 similarity_column = SNoRe.HDI(hashes, [i])
-            feature = (np.digitize(similarity_column.toarray(),
-                                   bins=bins) - 1) / (self.num_bins - 1)
-            feature = sparse.coo_matrix(feature, dtype=np.half)
+            if self.num_bins is not None:
+                feature = (np.digitize(similarity_column.toarray(),
+                                       bins=bins) - 1) / (self.num_bins - 1)
+                feature = sparse.coo_matrix(feature, dtype=np.half)
+            else:
+                feature = similarity_column
             # Reduce tau by number of nonzero similarities
             tau -= len(feature.data)
             if tau >= 0:
