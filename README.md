@@ -17,7 +17,7 @@ An overview of the algorithm is presented in the image below:
 
 ![algorithm overview](https://github.com/smeznar/SNoRe/blob/master/images/algorithm_overview.png)
 
-# Installing SNoRe
+## Installing SNoRe
 ```
 python setup.py install
 ```
@@ -28,7 +28,7 @@ or
 pip install snore-embedding
 ```
 
-# Using SNoRe
+## Using SNoRe
 A simple use-case is shown below.
 First, we import the necessary libraries and load the dataset and its labels.
 
@@ -42,7 +42,7 @@ from sklearn.metrics import f1_score
 import numpy as np
 
 # Load adjacency matrix and labels
-dataset = loadmat("../data/cora.mat")
+dataset = loadmat("data/cora.mat")
 network_adj = dataset["network"]
 labels = dataset["group"]
 ```
@@ -80,4 +80,40 @@ print("Micro score:",
 
 ```
 
-Further examples of evaluation and embedding explainability can be found in the example folder.
+Further examples of evaluation and embedding explainability can be found in the examples folder.
+
+## Hyperparameter explanation
+
+SNoRe uses the following hyperparameters and their default values:
+
+| Hyperparameter  | Description                                                                                                                                                                                                                                | Default Value |
+|-----------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|
+| dimension       | The number of features if fixed number of features are used, otherwise the number of features that make up space equivalent to &#124;N&#124;*dimensions                                                                                    | 256           |
+| num_walks       | The number of random walks for every node                                                                                                                                                                                                  | 1024          |
+| max_walk_length | The length of the longest random walk                                                                                                                                                                                                      | 5             |
+| inclusion       | Inclusion threshold. Node needs to be encountered with frequency inclusion to appear in the hash representation                                                                                                                            | 0.005         |
+| fixed_dimension | If True, fixed number of features are used, otherwise space equivalent to &#124;N&#124;*dimensions is used                                                                                                                                 | False         |
+| metric          | Metric used for similarity calculation. Metrics 'cosine','HPI','HDI','euclidean', 'jaccard', 'seuclidean', and 'canberra' can be used when calculating the embedding of fixed dimensions, otherwise 'cosine', 'HPI', and 'HDI' can be used | 'cosine'      |
+| num_bins        | Number of bins used in SNoRe SDF to digitize the embedding and reduce it's size. The values are not digitized if None is chosen.                                                                                                           | 256           |
+
+## Results against other baselines
+
+In the above mentioned paper we test SNoRe and it's extension SNoRe SDF against NetMF (SCD), Deepwalk, node2vec,
+LINE, PPRS, VGAE, Label Propagation, and the random baseline. The results can be seen on the image below:
+
+![micro f1 results](https://github.com/smeznar/SNoRe/blob/master/images/micro_plot_baseline.png)
+
+By aggregating this results we get scores presented in the table below:
+
+![micro f1 table](https://github.com/smeznar/SNoRe/blob/master/images/f1_table.png)
+
+## Latent clustering with UMAP
+
+We can use tools such as UMAP to cluster the embedding we create with SNoRe and see if nodes with similar labels
+cluster together. Such clusterings can be seen in the image below.
+
+![micro f1 results](https://github.com/smeznar/SNoRe/blob/master/images/umap.png)
+
+To create such clustering you can start with code in *examples/umap_example.py*.
+
+
