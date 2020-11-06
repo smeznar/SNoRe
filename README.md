@@ -13,7 +13,7 @@ found here:
 }
 ```
 
-An overview of the algorithm is presented in the image below:
+An overview of the algorithm is presented in the image below.
 
 ![algorithm overview](https://github.com/smeznar/SNoRe/blob/master/images/algorithm_overview.png)
 
@@ -99,13 +99,26 @@ SNoRe uses the following hyperparameters and their default values:
 ## Results against other baselines
 
 In the above mentioned paper we test SNoRe and it's extension SNoRe SDF against NetMF (SCD), Deepwalk, node2vec,
-LINE, PPRS, VGAE, Label Propagation, and the random baseline. The results can be seen on the image below:
+LINE, PPRS, VGAE, Label Propagation, and the random baseline. The results can be seen on the image below.
 
 ![micro f1 results](https://github.com/smeznar/SNoRe/blob/master/images/micro_plot_baseline.png)
 
-By aggregating this results we get scores presented in the table below:
+By aggregating this results we get scores presented in the table below.
 
 ![micro f1 table](https://github.com/smeznar/SNoRe/blob/master/images/f1_table.png)
+
+## Embedding interpretability with SHAP
+
+An advantage of SNoRe is the ability to interpret why instances were predicted the way they were. We can do such
+interpretation for a single instance as show in the image below.
+
+![micro f1 table](https://github.com/smeznar/SNoRe/blob/master/images/waterfall.png)
+
+We can also see which features are the most important with the summary plot shown in the image below.
+
+![micro f1 table](https://github.com/smeznar/SNoRe/blob/master/images/Shap_pubmed.png)
+
+To try the interpretation for yourself use code in the example *examples/explainability_example.py*. 
 
 ## Latent clustering with UMAP
 
