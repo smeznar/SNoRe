@@ -1,6 +1,6 @@
 # SNoRe: Scalable Unsupervised Learning of Symbolic Node Representations
 This repository contains the implementation of SNoRe algorithm from SNoRe paper
-found here:
+found [here](https://ieeexplore.ieee.org/document/9265235):
 
 ```
 @ARTICLE{meznar2020snore,
@@ -8,9 +8,9 @@ found here:
          journal={IEEE Access}, 
          title={SNoRe: Scalable Unsupervised Learning of Symbolic Node Representations},
          year={2020},
-         volume={},
+         volume={8},
          number={}, 
-         pages={1-1},
+         pages={212568-212588},
          doi={10.1109/ACCESS.2020.3039541}}
 ```
 
