@@ -36,6 +36,7 @@ def numba_walk_kernel(walk_matrix,
         offset = walk * length
         walk_matrix[offset] = node_name
         for step in prange(num_steps):
+            np.random.seed(walk*num_walks + step)
             num_neighs = sparse_pointers[curr + 1] - sparse_pointers[curr]
             if num_neighs > 0:
                 curr = sparse_neighbors[sparse_pointers[curr] +
@@ -66,7 +67,9 @@ class SNoRe:
                  inclusion=0.005,
                  fixed_dimension=False,
                  metric="cosine",
-                 num_bins=256):
+                 num_bins=256,
+                 seed=18):
+        np.random.seed(seed)
         self.dimension = dimension
         self.num_walks = num_walks
         self.max_walk_length = max_walk_length
@@ -102,7 +105,7 @@ class SNoRe:
         hashes = self.generate_walk_hashes(network)
 
         # Rank nodes
-        pagerank_scores = nx.pagerank_scipy(
+        pagerank_scores = nx.pagerank(
             nx.from_scipy_sparse_matrix(network))
         ranked_features = np.argsort(
             [pagerank_scores[i] for i in range(len(pagerank_scores))])[::-1]
@@ -286,4 +289,4 @@ if __name__ == '__main__':
     network_adj = loadmat("../data/cora.mat")["network"]
     embedder = SNoRe(metric="HPI")
     emb = embedder.embed(network_adj)
-    print(emb.shape)
+    print(emb)
