@@ -106,7 +106,7 @@ class SNoRe:
 
         # Rank nodes
         pagerank_scores = nx.pagerank(
-            nx.from_scipy_sparse_matrix(network))
+            nx.from_scipy_sparse_array(network))
         ranked_features = np.argsort(
             [pagerank_scores[i] for i in range(len(pagerank_scores))])[::-1]
 
